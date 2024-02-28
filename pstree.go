@@ -28,7 +28,9 @@ func New() (*Tree, error) {
 	for _, dir := range files {
 		proc, err := scan(dir)
 		if err != nil {
-			return nil, fmt.Errorf("could not scan %s: %w", dir, err)
+			// drop killed process
+			// return nil, fmt.Errorf("could not scan %s: %w", dir, err)
+			continue
 		}
 		if proc.Stat.PID == 0 {
 			// process vanished since Glob.
@@ -37,18 +39,27 @@ func New() (*Tree, error) {
 		procs[proc.Stat.PID] = proc
 	}
 
+	dropprocs := []int{}
 	for pid, proc := range procs {
 		if proc.Stat.Ppid == 0 {
 			continue
 		}
 		parent, ok := procs[proc.Stat.Ppid]
 		if !ok {
-			return nil, fmt.Errorf("pstree: parent pid=%d of pid=%d does not exist",
-				proc.Stat.Ppid, pid,
-			)
+			// if not found parent process
+			// drop current
+			dropprocs = append(dropprocs, pid)
+			continue
+			//return nil, fmt.Errorf("pstree: parent pid=%d of pid=%d does not exist",
+			//	proc.Stat.Ppid, pid,
+			//)
 		}
 		parent.Children = append(parent.Children, pid)
 		procs[parent.Stat.PID] = parent
+	}
+
+	for _, key := range dropprocs {
+		delete(procs, key)
 	}
 
 	for pid, proc := range procs {

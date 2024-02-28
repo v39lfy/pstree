@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -9,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sbinet/pstree"
+	"github.com/v39lfy/pstree"
 )
 
 func main() {

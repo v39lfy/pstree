@@ -11,7 +11,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/sbinet/pstree"
+	"github.com/v39lfy/pstree"
 )
 
 func main() {
