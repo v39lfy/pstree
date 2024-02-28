@@ -59,7 +59,7 @@ func New() (*Tree, error) {
 	}
 
 	for _, key := range dropprocs {
-		delete(procs, key)
+		recursion_delete_children(procs, key)
 	}
 
 	for pid, proc := range procs {
@@ -73,6 +73,17 @@ func New() (*Tree, error) {
 		Procs: procs,
 	}
 	return tree, err
+}
+
+func recursion_delete_children(procs map[int]Process, key int) {
+
+	if v, ok := procs[key]; ok {
+		delete(procs, key)
+
+		for _, subkey := range v.Children {
+			recursion_delete_children(procs, subkey)
+		}
+	}
 }
 
 const (
